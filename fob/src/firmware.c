@@ -260,19 +260,19 @@ void pairFob(FLASH_DATA *fob_state_ram)
           message.buffer = sha256_test();
             
             //this will encrypt the hash back into message.buffer
-            #ifdef EXAMPLE_AES
-
-              struct AES_ctx ctx;
-              uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
-              int8_t Iv[16];
-
-              //AES_init_ctx(&ctx, key);
-              AES_init_ctx_iv(&ctx, key, (uint8_t *)Iv);
-
-               //encrypt buffer (encryption happens in place)
-              AES_CBC_encrypt_buffer(&ctx, message.buffer, sizeof(message.buffer));
-
-            #endif
+//            #ifdef EXAMPLE_AES
+//
+//              struct AES_ctx ctx;
+//              uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
+//              int8_t Iv[16];
+//
+//              //AES_init_ctx(&ctx, key);
+//              AES_init_ctx_iv(&ctx, key, (uint8_t *)Iv);
+//
+//               //encrypt buffer (encryption happens in place)
+//              AES_CBC_encrypt_buffer(&ctx, message.buffer, sizeof(message.buffer));
+//
+//            #endif
           
         send_board_message(&message);
           
@@ -360,19 +360,19 @@ void unlockCar(FLASH_DATA *fob_state_ram)
     message.buffer = sha256_test();
       
       //this will encrypt the hash back into message.buffer
-      #ifdef EXAMPLE_AES
-
-        struct AES_ctx ctx;
-        uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
-        int8_t Iv[16];
-
-        //AES_init_ctx(&ctx, key);
-        AES_init_ctx_iv(&ctx, key, (uint8_t *)Iv);
-
-         //encrypt buffer (encryption happens in place)
-        AES_CBC_encrypt_buffer(&ctx, message.buffer, sizeof(message.buffer));
-
-      #endif
+//      #ifdef EXAMPLE_AES
+//
+//        struct AES_ctx ctx;
+//        uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
+//        int8_t Iv[16];
+//
+//        //AES_init_ctx(&ctx, key);
+//        AES_init_ctx_iv(&ctx, key, (uint8_t *)Iv);
+//
+//         //encrypt buffer (encryption happens in place)
+//        AES_CBC_encrypt_buffer(&ctx, message.buffer, sizeof(message.buffer));
+//
+//      #endif
       
     send_board_message(&message);
   }
