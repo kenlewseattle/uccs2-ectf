@@ -45,7 +45,7 @@ def main():
         fp.write("#define __CAR_SECRETS__\n\n")
         fp.write(f"#define CAR_SECRET {car_secret}\n\n")
         fp.write(f'#define CAR_ID "{args.car_id}"\n\n')
-        fp.write('#define PASSWORD "unlock"\n\n')
+        fp.write('#define PASSWORD "no12no"\n\n')
         fp.write("#endif\n")
 
 
