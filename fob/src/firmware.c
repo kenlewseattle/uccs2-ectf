@@ -329,47 +329,51 @@ void unlockCar(FLASH_DATA *fob_state_ram)
 {
   if (fob_state_ram->paired == FLASH_PAIRED)
   {
-//      BYTE text1[] ="ABCD";
-//      BYTE text2[] = CAR_ID;
-//      size_t byte_len = sizeof(text1) + sizeof(text2);
-//      BYTE text3[byte_len];
-//      size_t offset = 0;
-//      memcpy(text3 + offset, text1, sizeof(text1));
-//      offset += sizeof(text1);
-//      memcpy(text3 + offset, text2, sizeof(text2));
-//
-//      BYTE buf[SHA256_BLOCK_SIZE];
-//      SHA256_CTX ctx;
-//      sha256_init(&ctx);
-//      sha256_update(&ctx, text3, byte_len);
-//      sha256_final(&ctx, buf);
-//
-//    MESSAGE_PACKET message;
-//    message.message_len = SHA256_BLOCK_SIZE;
-//    message.magic = UNLOCK_MAGIC;
-//    message.buffer = buf;
-//    send_board_message(&message);
+    /**SHA256 function if needed to be implemented. During the hash implementation, this was a function call "int SHA256()" in the global. However, error came up during pairing as Error 1 and Error 2 depending on the changes. I believe the issue is memory management during the pairing phase where the error occurs with pair_tool session. Once this is implemented here in unlockCar() function, the error shifts from pairing to unlocking. My assumption would be one or two things could have happened. First could be the pairing process where the transfer of data that it pull for hashing is incorrect. **/
       
-      MESSAGE_PACKET message;
-      message.message_len = 6;
-      message.magic = UNLOCK_MAGIC;
-      message.buffer = fob_state_ram->pair_info.password;
-      
-#ifdef EXAMPLE_AES
-      
-  struct AES_ctx ctx;
-  uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
-  int8_t Iv[16];
+      BYTE text1[] = PASSWORD;
+      BYTE text2[] = CAR_ID;
+      size_t byte_len = sizeof(text1) + sizeof(text2);
+      BYTE text3[byte_len];
+      size_t offset = 0;
+      memcpy(text3 + offset, text1, sizeof(text1));
+      offset += sizeof(text1);
+      memcpy(text3 + offset, text2, sizeof(text2));
 
-   
-  //AES_init_ctx(&ctx, key);
-      AES_init_ctx_iv(&ctx, key, (uint8_t *)Iv);
+      BYTE buf[SHA256_BLOCK_SIZE];
+      SHA256_CTX ctx;
+      sha256_init(&ctx);
+      sha256_update(&ctx, text3, byte_len);
+      sha256_final(&ctx, buf);
 
-   //encrypt buffer (encryption happens in place)
-  AES_CBC_encrypt_buffer(&ctx, message.buffer, sizeof(message.buffer));
-   
-#endif
-      send_board_message(&message);
+    MESSAGE_PACKET message;
+    message.message_len = SHA256_BLOCK_SIZE;
+    message.magic = UNLOCK_MAGIC;
+    message.buffer = buf;
+    send_board_message(&message);
+      
+//      MESSAGE_PACKET message;
+//      message.message_len = 6;
+//      message.magic = UNLOCK_MAGIC;
+//      message.buffer = fob_state_ram->pair_info.password;
+
+/**In this following block of code is utilizing AES from TinyAES. Instead of using the example default mode in which is Electronic Code Book (ECB), I have utilized the Cipher Block Chaining (CBC) that is known to be more secure than the ECB.**/
+//#ifdef EXAMPLE_AES
+//
+//  struct AES_ctx ctx;
+//  uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
+//
+//  //Initializing Vector
+//  int8_t Iv[16];
+//
+//  //AES_init_ctx(&ctx, key);
+//      AES_init_ctx_iv(&ctx, key, (uint8_t *)Iv);
+//
+//   //encrypt message buffer before sending &message
+//  AES_CBC_encrypt_buffer(&ctx, message.buffer, sizeof(message.buffer));
+//
+//#endif
+      //send_board_message(&message);
   }
 }
 

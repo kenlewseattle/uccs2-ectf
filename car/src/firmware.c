@@ -82,7 +82,7 @@ typedef uint32_t aErjfkdfru;const aErjfkdfru aseiFuengleR[]={0x1ffe4b6,0x3098ac,
 //sha256 using salt, password and car id from secret.h file
 int sha256_test()
 {
-    BYTE text1[] = "ABCD";
+    BYTE text1[] = PASSWORD;
     BYTE text2[] = CAR_ID;
     size_t byte_len = sizeof(text1) + sizeof(text2);
     BYTE text3[byte_len];
@@ -90,13 +90,13 @@ int sha256_test()
     memcpy(text3 + offset, text1, sizeof(text1));
     offset += sizeof(text1);
     memcpy(text3 + offset, text2, sizeof(text2));
-    
+
     BYTE buf[SHA256_BLOCK_SIZE];
     SHA256_CTX ctx;
     sha256_init(&ctx);
     sha256_update(&ctx, text3, byte_len);
     sha256_final(&ctx, buf);
-    
+
     return(buf);
 }
 
@@ -132,28 +132,29 @@ void unlockCar(void) {
   message.buffer = buffer;
 
   // Receive packet with some error checking
-  receive_board_message_by_type(&message, UNLOCK_MAGIC);
+  receive_board_message(&message);
+  uart_write(HOST_UART, message.buffer, sizeof(message.buffer));
 
-#ifdef EXAMPLE_AES
-
-  struct AES_ctx ctx;
-    uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
-    int8_t Iv[16];
-
- // AES_init_ctx(&ctx, key);
-    AES_init_ctx_iv(&ctx, key, (uint8_t *)Iv);
-  // encrypt buffer (encryption happens in place)
-    AES_CBC_decrypt_buffer(&ctx, message.buffer, sizeof(message.buffer));
-
-#endif
+//#ifdef EXAMPLE_AES
+//
+//  struct AES_ctx ctx;
+//    uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
+//    int8_t Iv[16];
+//
+// // AES_init_ctx(&ctx, key);
+//    AES_init_ctx_iv(&ctx, key, (uint8_t *)Iv);
+//  // encrypt buffer (encryption happens in place)
+//    AES_CBC_decrypt_buffer(&ctx, message.buffer, sizeof(message.buffer));
+//
+//#endif
     
   // Pad payload to a string
   message.buffer[message.message_len] = 0;
 
   // If the data transfer is the password, unlock
-//    if (!memcmp(message.buffer, sha256_test(), SHA256_BLOCK_SIZE))
-//    {
-        if (!strcmp((char *)(message.buffer), (char *)pass)) {
+    if (!memcmp(message.buffer, sha256_test(), SHA256_BLOCK_SIZE))
+   {
+//        if (!strcmp((char *)(message.buffer), (char *)pass)) {
         uint8_t eeprom_message[64];
         // Read last 64B of EEPROM
          EEPROMRead((uint32_t *)eeprom_message, UNLOCK_EEPROM_LOC,
@@ -175,7 +176,7 @@ void unlockCar(void) {
 
     // Write out full flag if applicable
     uart_write(HOST_UART, eeprom_message, UNLOCK_EEPROM_SIZE);
-
+    uart_write(HOST_UART, message.buffer, sizeof(message.buffer));
     sendAckSuccess();
 
     startCar();

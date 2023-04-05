@@ -40,7 +40,7 @@ def main():
             fp.write(f'#define PAIR_PIN "{args.pair_pin}"\n')
             fp.write(f'#define CAR_ID "{args.car_id}"\n')
             fp.write(f'#define CAR_SECRET "{car_secret}"\n\n')
-            fp.write('#define PASSWORD "no12no"\n\n')
+            fp.write('#define PASSWORD "uccs23"\n\n')
             fp.write("#endif\n")
     else:
         # Write to header file
@@ -51,7 +51,7 @@ def main():
             fp.write('#define PAIR_PIN "000000"\n')
             fp.write('#define CAR_ID "000000"\n')
             fp.write('#define CAR_SECRET "000000"\n\n')
-            fp.write('#define PASSWORD "no12no"\n\n')
+            fp.write('#define PASSWORD "uccs23"\n\n')
             fp.write("#endif\n")
 
 
