@@ -48,6 +48,8 @@
 #define FLASH_PAIRED 0x00
 #define FLASH_UNPAIRED 0xFF
 
+#define ECB 1
+
 /*** Structure definitions ***/
 // Defines a struct for the format of an enable message
 typedef struct
@@ -362,17 +364,18 @@ void unlockCar(FLASH_DATA *fob_state_ram)
 //
 //  struct AES_ctx ctx;
 //  uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
-//
-//  //Initializing Vector
-//  int8_t Iv[16];
-//
-//  //AES_init_ctx(&ctx, key);
-//      AES_init_ctx_iv(&ctx, key, (uint8_t *)Iv);
+//      uint8_t plaintext[16] = "0123456789abcdef";
+//      // initialize context
+//      AES_init_ctx(&ctx, key);
 //
 //   //encrypt message buffer before sending &message
-//  AES_CBC_encrypt_buffer(&ctx, message.buffer, sizeof(message.buffer));
+//
+//  AES_ECB_encrypt(&ctx, plaintext);
+//      message.buffer = plaintext;
+//      send_board_message(&message);
 //
 //#endif
+      //message.buffer = plaintext;
       //send_board_message(&message);
   }
 }
