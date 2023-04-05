@@ -329,7 +329,7 @@ void unlockCar(FLASH_DATA *fob_state_ram)
 {
   if (fob_state_ram->paired == FLASH_PAIRED)
   {
-      BYTE text1[] = PASSWORD;
+      BYTE text1[] ="ABCD";
       BYTE text2[] = CAR_ID;
       size_t byte_len = sizeof(text1) + sizeof(text2);
       BYTE text3[byte_len];
