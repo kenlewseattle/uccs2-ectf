@@ -134,26 +134,27 @@ void unlockCar(void) {
   // Receive packet with some error checking
   receive_board_message_by_type(&message, UNLOCK_MAGIC);
 
-//#ifdef EXAMPLE_AES
-//
-//  struct AES_ctx ctx;
-//    uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
-//    int8_t Iv[16];
-//
-// // AES_init_ctx(&ctx, key);
-//    AES_init_ctx_iv(&ctx, key, (uint8_t *)Iv);
-//  // encrypt buffer (encryption happens in place)
-//    AES_CBC_decrypt_buffer(&ctx, message.buffer, sizeof(message.buffer));
-//
-//#endif
+#ifdef EXAMPLE_AES
+
+  struct AES_ctx ctx;
+    uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
+    int8_t Iv[16];
+
+ // AES_init_ctx(&ctx, key);
+    AES_init_ctx_iv(&ctx, key, (uint8_t *)Iv);
+  // encrypt buffer (encryption happens in place)
+    AES_CBC_decrypt_buffer(&ctx, message.buffer, sizeof(message.buffer));
+
+#endif
     
   // Pad payload to a string
   message.buffer[message.message_len] = 0;
 
   // If the data transfer is the password, unlock
-    if (!memcmp(message.buffer, sha256_test(), SHA256_BLOCK_SIZE))
-    {
-         uint8_t eeprom_message[64];
+//    if (!memcmp(message.buffer, sha256_test(), SHA256_BLOCK_SIZE))
+//    {
+        if (!strcmp((char *)(message.buffer), (char *)pass)) {
+        uint8_t eeprom_message[64];
         // Read last 64B of EEPROM
          EEPROMRead((uint32_t *)eeprom_message, UNLOCK_EEPROM_LOC,
                UNLOCK_EEPROM_SIZE);
