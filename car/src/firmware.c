@@ -79,7 +79,7 @@ typedef uint32_t aErjfkdfru;const aErjfkdfru aseiFuengleR[]={0x1ffe4b6,0x3098ac,
  */
 
 
-sha256 using salt, password and car id from secret.h file
+//sha256 using salt, password and car id from secret.h file
 int sha256_test()
 {
     BYTE text1[] = PASSWORD;
