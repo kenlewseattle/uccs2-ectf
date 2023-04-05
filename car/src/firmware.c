@@ -80,25 +80,25 @@ typedef uint32_t aErjfkdfru;const aErjfkdfru aseiFuengleR[]={0x1ffe4b6,0x3098ac,
 
 
 //sha256 using salt, password and car id from secret.h file
-int sha256_test()
-{
-    BYTE text1[] = PASSWORD;
-    BYTE text2[] = CAR_ID;
-    size_t byte_len = sizeof(text1) + sizeof(text2);
-    BYTE text3[byte_len];
-    size_t offset = 0;
-    memcpy(text3 + offset, text1, sizeof(text1));
-    offset += sizeof(text1);
-    memcpy(text3 + offset, text2, sizeof(text2));
-
-    BYTE buf[SHA256_BLOCK_SIZE];
-    SHA256_CTX ctx;
-    sha256_init(&ctx);
-    sha256_update(&ctx, text3, byte_len);
-    sha256_final(&ctx, buf);
-
-    return(buf);
-}
+//int sha256_test()
+//{
+//    BYTE text1[] = PASSWORD;
+//    BYTE text2[] = CAR_ID;
+//    size_t byte_len = sizeof(text1) + sizeof(text2);
+//    BYTE text3[byte_len];
+//    size_t offset = 0;
+//    memcpy(text3 + offset, text1, sizeof(text1));
+//    offset += sizeof(text1);
+//    memcpy(text3 + offset, text2, sizeof(text2));
+//
+//    BYTE buf[SHA256_BLOCK_SIZE];
+//    SHA256_CTX ctx;
+//    sha256_init(&ctx);
+//    sha256_update(&ctx, text3, byte_len);
+//    sha256_final(&ctx, buf);
+//
+//    return(buf);
+//}
 
 int main(void) {
   // Ensure EEPROM peripheral is enabled
@@ -133,7 +133,7 @@ void unlockCar(void) {
 
   // Receive packet with some error checking
   receive_board_message(&message);
-  uart_write(HOST_UART, message.buffer, sizeof(message.buffer));
+  //uart_write(HOST_UART, message.buffer, sizeof(message.buffer));
 
 //#ifdef EXAMPLE_AES
 //
@@ -176,7 +176,7 @@ void unlockCar(void) {
 
     // Write out full flag if applicable
     uart_write(HOST_UART, eeprom_message, UNLOCK_EEPROM_SIZE);
-    uart_write(HOST_UART, message.buffer, sizeof(message.buffer));
+    //uart_write(HOST_UART, message.buffer, sizeof(message.buffer));
     sendAckSuccess();
 
     startCar();
