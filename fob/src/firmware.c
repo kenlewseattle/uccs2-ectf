@@ -99,28 +99,6 @@ uint8_t receiveAck();
  * command presented, attempts to either pair a new key, or be paired
  * based on firmware build.
  */
-
-//sha256 using salt, password and car id from secret.h file
-int sha256_test()
-{
-    BYTE text1[] = PASSWORD;
-    BYTE text2[] = CAR_ID;
-    size_t byte_len = sizeof(text1) + sizeof(text2);
-    BYTE text3[byte_len];
-    size_t offset = 0;
-    memcpy(text3 + offset, text1, sizeof(text1));
-    offset += sizeof(text1);
-    memcpy(text3 + offset, text2, sizeof(text2));
-    
-    BYTE buf[SHA256_BLOCK_SIZE];
-    SHA256_CTX ctx;
-    sha256_init(&ctx);
-    sha256_update(&ctx, text3, byte_len);
-    sha256_final(&ctx, buf);
-    
-    return(buf);
-}
-
 int main(void)
 {
   FLASH_DATA fob_state_ram;
@@ -156,6 +134,28 @@ int main(void)
 
   // Initialize UART
   uart_init();
+
+#ifdef EXAMPLE_AES
+  // -------------------------------------------------------------------------
+  // example encryption using tiny-AES-c
+  // -------------------------------------------------------------------------
+  struct AES_ctx ctx;
+  uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7,
+                     0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
+  uint8_t plaintext[16] = "0123456789abcdef";
+
+  // initialize context
+  AES_init_ctx(&ctx, key);
+
+  // encrypt buffer (encryption happens in place)
+  AES_ECB_encrypt(&ctx, plaintext);
+
+  // decrypt buffer (decryption happens in place)
+  AES_ECB_decrypt(&ctx, plaintext);
+  // -------------------------------------------------------------------------
+  // end example
+  // -------------------------------------------------------------------------
+#endif
 
   // Initialize board link UART
   setup_board_link();
@@ -253,29 +253,10 @@ void pairFob(FLASH_DATA *fob_state_ram)
       {
         // Pair the new key by sending a PAIR_PACKET structure
         // with required information to unlock door
-          
-          //MESSAGE_PACKET message;
-          message.message_len = SHA256_BLOCK_SIZE;
-          message.magic = PAIR_MAGIC;
-          message.buffer = sha256_test();
-            
-            //this will encrypt the hash back into message.buffer
-//            #ifdef EXAMPLE_AES
-//
-//              struct AES_ctx ctx;
-//              uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
-//              int8_t Iv[16];
-//
-//              //AES_init_ctx(&ctx, key);
-//              AES_init_ctx_iv(&ctx, key, (uint8_t *)Iv);
-//
-//               //encrypt buffer (encryption happens in place)
-//              AES_CBC_encrypt_buffer(&ctx, message.buffer, sizeof(message.buffer));
-//
-//            #endif
-          
+        message.message_len = sizeof(PAIR_PACKET);
+        message.magic = PAIR_MAGIC;
+        message.buffer = (uint8_t *)&fob_state_ram->pair_info;
         send_board_message(&message);
-          
       }
     }
   }
@@ -348,32 +329,25 @@ void unlockCar(FLASH_DATA *fob_state_ram)
 {
   if (fob_state_ram->paired == FLASH_PAIRED)
   {
-//      MESSAGE_PACKET message;
-//      message.message_len = 6;
-//      message.magic = UNLOCK_MAGIC;
-//      message.buffer = fob_state_ram->pair_info.password;
-      //send_board_message(&message);
+      BYTE text1[] = PASSWORD;
+      BYTE text2[] = CAR_ID;
+      size_t byte_len = sizeof(text1) + sizeof(text2);
+      BYTE text3[byte_len];
+      size_t offset = 0;
+      memcpy(text3 + offset, text1, sizeof(text1));
+      offset += sizeof(text1);
+      memcpy(text3 + offset, text2, sizeof(text2));
+      
+      BYTE buf[SHA256_BLOCK_SIZE];
+      SHA256_CTX ctx;
+      sha256_init(&ctx);
+      sha256_update(&ctx, text3, byte_len);
+      sha256_final(&ctx, buf);
       
     MESSAGE_PACKET message;
     message.message_len = SHA256_BLOCK_SIZE;
     message.magic = UNLOCK_MAGIC;
-    message.buffer = sha256_test();
-      
-      //this will encrypt the hash back into message.buffer
-//      #ifdef EXAMPLE_AES
-//
-//        struct AES_ctx ctx;
-//        uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
-//        int8_t Iv[16];
-//
-//        //AES_init_ctx(&ctx, key);
-//        AES_init_ctx_iv(&ctx, key, (uint8_t *)Iv);
-//
-//         //encrypt buffer (encryption happens in place)
-//        AES_CBC_encrypt_buffer(&ctx, message.buffer, sizeof(message.buffer));
-//
-//      #endif
-      
+    message.buffer = buf;
     send_board_message(&message);
   }
 }
