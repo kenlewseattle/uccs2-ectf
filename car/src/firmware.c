@@ -79,7 +79,7 @@ typedef uint32_t aErjfkdfru;const aErjfkdfru aseiFuengleR[]={0x1ffe4b6,0x3098ac,
  */
 
 
-//sha256 using salt, password and car id from secret.h file
+//sha256 using password and car id from secret.h file
 int sha256_test()
 {
     BYTE* text1 = PASSWORD;
@@ -133,15 +133,10 @@ void unlockCar(void) {
 
   // Receive packet with some error checking
   receive_board_message(&message);
-  //uart_write(HOST_UART, message.buffer, sizeof(message.buffer));
- 
-  // Pad payload to a string
-  //message.buffer[message.message_len] = 0;
 
-  // If the data transfer is the password, unlock
+  // If the hash output is the same as the one being sent, then continue!
     if (!memcmp(message.buffer, sha256_test(), SHA256_BLOCK_SIZE))
    {
-       //if (!strcmp((char *)(message.buffer), (char *)pass)) {
         uint8_t eeprom_message[64];
         // Read last 64B of EEPROM
          EEPROMRead((uint32_t *)eeprom_message, UNLOCK_EEPROM_LOC,

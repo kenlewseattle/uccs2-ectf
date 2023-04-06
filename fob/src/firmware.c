@@ -331,12 +331,12 @@ void unlockCar(FLASH_DATA *fob_state_ram)
 {
   if (fob_state_ram->paired == FLASH_PAIRED)
   {
-    /**SHA256 function if needed to be implemented. During the hash implementation, this was a function call "int SHA256()" in the global. However, error came up during pairing as Error 1 and Error 2 depending on the changes. I believe the issue is memory management during the pairing phase where the error occurs with pair_tool session. Once this is implemented here in unlockCar() function, the error shifts from pairing to unlocking. My assumption would be one or two things could have happened. First could be the pairing process where the transfer of data that it pull for hashing is incorrect. **/
+    /**SHA256 is implemented here in this unlockCar function. It can however be declared outside of main(). I have used text 1 & 2 to store the password and car id that is in a paired fob while concatenate both password and car id into another text called text 3. Using SHA256.h and SHA256.c, I am able to initialize, update and produce final hash that will consistently update BYTE buf.
+     
+       With the original structure, I am able to use SHA256 block size and declare into message length and send the buf via message.buffer variable. On the car side, the car will also be producing the same hash for verification in the car's unlockCar() function.**/
       
       BYTE* text1 = fob_state_ram->pair_info.password;
       BYTE* text2 = fob_state_ram->pair_info.car_id;
-//      BYTE* text1 = PASSWORD;
-//      BYTE* text2 = CAR_ID;
       size_t byte_len = sizeof(text1) + sizeof(text2);
       BYTE text3[byte_len];
       size_t offset = 0;
@@ -368,6 +368,27 @@ void startCar(FLASH_DATA *fob_state_ram)
 {
   if (fob_state_ram->paired == FLASH_PAIRED)
   {
+//      BYTE* text4 = fob_state_ram->pair_info.password;
+//      BYTE* text5 = fob_state_ram->feature_info;
+//      size_t byte_len = sizeof(text4) + sizeof(text5);
+//      BYTE text3[byte_len];
+//      size_t offset = 0;
+//      memcpy(text3 + offset, text1, sizeof(text1));
+//      offset += sizeof(text1);
+//      memcpy(text3 + offset, text2, sizeof(text2));
+//
+//      BYTE buf[SHA256_BLOCK_SIZE];
+//      SHA256_CTX ctx;
+//      sha256_init(&ctx);
+//      sha256_update(&ctx, text3, byte_len);
+//      sha256_final(&ctx, buf);
+//
+//    MESSAGE_PACKET message;
+//    message.message_len = SHA256_BLOCK_SIZE;
+//    message.magic = START_MAGIC;
+//    message.buffer = buf;
+//    send_board_message(&message);
+      
     MESSAGE_PACKET message;
     message.magic = START_MAGIC;
     message.message_len = sizeof(FEATURE_DATA);

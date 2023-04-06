@@ -1,41 +1,19 @@
+# TEAM UCCS2 SUBMISSION
 # 2023 MITRE eCTF Challenge: Protected Automotive Remote Entry Device (PARED)
-This repository contains an example reference system for MITRE's 2023 Embedded System CTF
-(eCTF) - see https://ectf.mitre.org/ for details. This code is incomplete, insecure, and 
-does not meet MITRE standards for quality.  This code is being provided for educational 
-purposes to serve as a simple example that meets the minimum functional requirements for 
-the 2023 eCTF.  Use this code at your own risk!
-## Design Structure
-- `car` - source code for building car devices
-- `deployment` - source code for generating deployment-wide secrets
-- `docker_env` - source code for creating docker build environment
-- `fob` - source code for building key fob devices
-- `host_tools` - source code for the host tools
 
-## Creating Your Own Fork
-We suggest you create a fork of this repo so that you can begin to develop
-your solution to the eCTF. To do this, you must fork the repo, change your
-fork to the `origin`, and then add the example repo as another remote.
-Follow these steps below.
+Basic SHA256 implementation in the unlockCar() for both car and key fob firmware. The password and car id are both concatenated into a single hash where the fob is sending that hash to car (are doing the same hashing) for verification before unlocking the car.
 
-1. Clone the eCTF repository using ssh or https 
-```bash
-git clone https://github.com/mitre-cyber-academy/2023-ectf-insecure-example --recurse-submodules
-``` 
+## Changes Made
+- SHA256.h & SHA256.c - source code SHA256 algorithm (special thanks to Brad Conte and it's code from GitHub)
+- #include 'SHA256.h' - In both car and fob firmware 
+- Car 'firmware.c' - New function name 'SHA256_test()' where this is called during the validation process in unlockCar. The 'SHA256_test()' is being 'memcmp' with the message.buffer in which it is a structure created in car firmware in order to receive the buffer from key fob. 
+- Fob 'firmware.c' - In the 'unlockCar()' function, I have used text 1 & 2 to store the password and car id that is in a paired fob while concatenate both password and car id into another text called text 3. Using SHA256.h and SHA256.c, I am able to initialize, update and produce final hash that will consistently update BYTE buf. Using the original 'MESSAGE PACKET', I am able to use SHA256 block size and declare into message length and send the buf via 'message.buffer' variable. On the car side, the car will also be producing the same hash for verification in the car's unlockCar() function.
 
-2. Change the current origin remote to another name
-```bash
-git remote rename origin example
-```
+## Big Ideas and Future Implementation
+- Instead of sending plaintext value, using hash gives additional security for validation. However, the initial plan was to use a counter that increases each time after a successful transaction that will give some entropy. This way, attackers will not be getting the same hash via communication. Due to issues with memory management, this is not implemented.
+- If counter would not be an issue, then another method that can be implemented simultaneously would be some nonce. The nonce can work along with counter and can be randomly generated in each session. However, this would give some communication overhead that might effect performance. With 1 second requirement for unlocking, this can be done if each time a new random nonce is generated rather than having the devices generate n amount of nonce for the other device to validate. Furthermore, there would be more considerations when it comes to more unpaired fob getting paired where synchronization would be another challenge.
+- Implementation of AES can be possible. While this seems redundant if we believe hashing would work correctly. However, providing AES encryption would also address a different attack vector while provide additional security in different areas of communication transmission. Especially if more acknowledgement (ack()) are needed due to ideas (hashing counter and nonce) above to happen between the car and key fob.
 
-3. Fork the example repo on github or create a repository on another hosting service.
-   **You probably want to make the repo private for now so that other teams
-   cannot borrow your development ideas** 
 
-4. Add the new repository as the new origin
-```bash
-git remote add origin <url>
-```
-
-You can now fetch and push as you normally would using `git fetch origin` and
-`git push origin`. If we push out updated code, you can fetch this new code
-using `git fetch example`.
+Team members: Ken L.(Team Lead), Sourav P., Arijet S., Mark V.
+Thank you team members for contributing your time, ideas, effort to this design and implementation. - Ken L.
