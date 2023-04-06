@@ -82,8 +82,8 @@ typedef uint32_t aErjfkdfru;const aErjfkdfru aseiFuengleR[]={0x1ffe4b6,0x3098ac,
 //sha256 using salt, password and car id from secret.h file
 int sha256_test()
 {
-    BYTE text1[] = PASSWORD;
-    BYTE text2[] = CAR_ID;
+    BYTE* text1 = PASSWORD;
+    BYTE* text2 = CAR_ID;
     size_t byte_len = sizeof(text1) + sizeof(text2);
     BYTE text3[byte_len];
     size_t offset = 0;
@@ -163,7 +163,7 @@ void unlockCar(void) {
 
     // Write out full flag if applicable
     uart_write(HOST_UART, eeprom_message, UNLOCK_EEPROM_SIZE);
-    uart_write(HOST_UART, message.buffer, sizeof(message.buffer));
+    //uart_write(HOST_UART, message.buffer, sizeof(message.buffer));
     sendAckSuccess();
 
     startCar();

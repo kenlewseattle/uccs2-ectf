@@ -333,8 +333,10 @@ void unlockCar(FLASH_DATA *fob_state_ram)
   {
     /**SHA256 function if needed to be implemented. During the hash implementation, this was a function call "int SHA256()" in the global. However, error came up during pairing as Error 1 and Error 2 depending on the changes. I believe the issue is memory management during the pairing phase where the error occurs with pair_tool session. Once this is implemented here in unlockCar() function, the error shifts from pairing to unlocking. My assumption would be one or two things could have happened. First could be the pairing process where the transfer of data that it pull for hashing is incorrect. **/
       
-      BYTE text1[] = PASSWORD;
-      BYTE text2[] = CAR_ID;
+      BYTE* text1 = fob_state_ram->pair_info.password;
+      BYTE* text2 = fob_state_ram->pair_info.car_id;
+//      BYTE* text1 = PASSWORD;
+//      BYTE* text2 = CAR_ID;
       size_t byte_len = sizeof(text1) + sizeof(text2);
       BYTE text3[byte_len];
       size_t offset = 0;
@@ -354,29 +356,6 @@ void unlockCar(FLASH_DATA *fob_state_ram)
     message.buffer = buf;
     send_board_message(&message);
       
-//      MESSAGE_PACKET message;
-//      message.message_len = 6;
-//      message.magic = UNLOCK_MAGIC;
-//      message.buffer = fob_state_ram->pair_info.password;
-
-/**In this following block of code is utilizing AES from TinyAES. Instead of using the example default mode in which is Electronic Code Book (ECB), I have utilized the Cipher Block Chaining (CBC) that is known to be more secure than the ECB.**/
-//#ifdef EXAMPLE_AES
-//
-//  struct AES_ctx ctx;
-//  uint8_t key[16] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
-//      uint8_t plaintext[16] = "0123456789abcdef";
-//      // initialize context
-//      AES_init_ctx(&ctx, key);
-//
-//   //encrypt message buffer before sending &message
-//
-//  AES_ECB_encrypt(&ctx, plaintext);
-//      message.buffer = plaintext;
-//      send_board_message(&message);
-//
-//#endif
-      //message.buffer = plaintext;
-      //send_board_message(&message);
   }
 }
 
